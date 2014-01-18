@@ -1,15 +1,13 @@
 // Emulate the game "Secret Santa" where there are 3 or more participants
 // no participant can receive their own gift or receive more than one gift
 var participants = [];
+var hatOfParticipants = [];
 
 function Participant (name, giftToGive) {
-
   this.name = name;
   this.giftToGive = giftToGive;
   this.giftReceived = null;
   this.receiver = null;
-  this.beenChosen = false;
-  this.hasChosen = false;
 }
 
 Participant.prototype.giveGift = function () {
@@ -19,6 +17,7 @@ Participant.prototype.giveGift = function () {
 var personJoin = function (name, gift) {
   var person = new Participant(name, gift);
   participants.push(person);
+  hatOfParticipants.push(person);
 };
 
 var choosePerson = function (player) {
@@ -29,19 +28,24 @@ var choosePerson = function (player) {
 };
 
 var getRandomParticipant = function (player) {
-  var personObjectOutOfAHat = participants[Math.floor(Math.random()*participants.length)];
+  var personObjectOutOfAHat = hatOfParticipants[Math.floor(Math.random()*hatOfParticipants.length)];
 
-  if(personObjectOutOfAHat === player || personObjectOutOfAHat.beenChosen === true) {
+  if(personObjectOutOfAHat === player) {
     return getRandomParticipant(player);
   } else {
-    personObjectOutOfAHat.beenChosen = true;
+    // remove name out of hat
+    for(var i in hatOfParticipants) {
+      if(hatOfParticipants[i] === personObjectOutOfAHat){
+        hatOfParticipants.splice(i, 1);
+      }
+    }
     return personObjectOutOfAHat;
   }
 };
 
 var startGame = function () {
   if(participants.length > 2) {
-    for(var i=0; i<participants.length; i++) {
+    for(var i in participants) {
       choosePerson(participants[i]);
     }
   }
