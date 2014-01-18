@@ -1,53 +1,60 @@
-// check if there are enough players
-// if there are enough players, players get matched with a secretSanta
-// they give that secret santa a gift
-//   make sure no player is given their own gift
-//   make sure no player gets more than one gift
+// Emulate the game "Secret Santa" where there are 3 or more participants
+// no participant can receive their own gift or receive more than one gift
 
 var participants = [];
 
-function Participant(name, giftToGive) {
+function Participant (name, giftToGive) {
 
   this.name = name;
   this.giftToGive = giftToGive;
-  this.giftGiven = [];
-  this.secretSanta = [];
-  this.assigned = false;
+  this.giftReceived = null;
+  this.receiver = null;
+  this.beenChosen = false;
+  this.hasChosen = false;
 }
 
-var personJoin = function(name, gift) {
-  name = new Participant(name, gift);
-  participants.push(name);
+Participant.prototype.giveGift = function () {
+  this.receiver.giftReceived = this.giftToGive;
+}
+
+var personJoin = function (name, gift) {
+  var person = new Participant(name, gift);
+  participants.push(person);
 };
 
-var checkPlayerCount = function(){
-  return (participants.length >= 3);
+var choosePerson = function (player) {
+  var chosenPerson = getRandomParticipant(player);
+  player.receiver = chosenPerson;
+  player.giveGift();
+  console.log(player.name,"has been assigned", chosenPerson.name, "and gave them", chosenPerson.giftReceived);
 };
 
-var getMatched = function(player){
-  player.secretSanta = getRandomParticipant();
-  if(player.secretSanta === player || player.secretSanta.assigned === true){
-    player.secretSanta = getRandomParticipant();
+var getRandomParticipant = function (player) {
+  var personObjectOutOfAHat = participants[Math.floor(Math.random()*participants.length)];
+
+  if(personObjectOutOfAHat === player || personObjectOutOfAHat.beenChosen === true) {
+    return getRandomParticipant(player);
+  } else {
+    personObjectOutOfAHat.beenChosen = true;
+    return personObjectOutOfAHat;
   }
-  player.secretSanta.assigned = true;
-  if(player.secretSanta.giftGiven.length < 1){
-    player.secretSanta.giftGiven = player.giftToGive;
-  }
 };
 
-var getRandomParticipant = function(){
-  return participants[Math.floor(Math.random()*participants.length)];
-};
-
-var allMatch = function(){
-  for(var i=0; i<participants.length; i++){
-    getMatched(participants[i]);
+var startGame = function () {
+  if(participants.length > 2) {
+    for(var i=0; i<participants.length; i++) {
+      choosePerson(participants[i]);
+    }
   }
 };
 
 personJoin("Tea","Book");
 personJoin("Albert","Shoes");
+personJoin("Patrik","Kite");
 personJoin("Remy","Bone");
+personJoin("McKenneth","Coffee");
+personJoin("Ryan Gosling","A poster of Ryan Gosling");
 
-allMatch();
-console.log(participants);
+// choosePerson(participants[0]);
+// choosePerson(participants[1]);
+startGame();
