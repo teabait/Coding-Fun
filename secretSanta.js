@@ -54,6 +54,4 @@ personJoin("Remy","Bone");
 personJoin("McKenneth","Coffee");
 personJoin("Ryan Gosling","A poster of Ryan Gosling");
 
-// choosePerson(participants[0]);
-// choosePerson(participants[1]);
 startGame();
